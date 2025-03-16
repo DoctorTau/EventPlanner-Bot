@@ -1,5 +1,6 @@
 import { Telegraf } from 'telegraf';
 import { getStorage, PollStorage } from './storage';
+import ServerRequest from './serverRequest';
 
 export function registerEventHandlers(bot: Telegraf) {
     let activePolls: PollStorage = getStorage();
@@ -30,17 +31,38 @@ export function registerEventHandlers(bot: Telegraf) {
         });
     });
 
-    bot.on('new_chat_members', (ctx) => {
+    bot.on('new_chat_members', async (ctx) => {
         if (!ctx.message || !ctx.message.new_chat_members) {
             return;
         }
 
-        if (ctx.message.new_chat_members.some((member) => member.id === bot.botInfo?.id)) {
-            ctx.reply('HELLO THERE!');
-            console.log('Bot added to chat:', ctx.chat?.id);
-        } else {
-            console.error('Unexpected new_chat_members event:', ctx.message.new_chat_members);
+        const chatName: string = (ctx.chat?.type === 'group' || ctx.chat?.type === 'supergroup') ? ctx.chat.title : 'Unknown Chat';
+        const creatorTelegramId: number = ctx.message.from.id;
+        const currentChatId: number = ctx.chat?.id || 0;
+
+        const serverRequest = ServerRequest.getInstance();
+
+        try {
+            if (ctx.message.new_chat_members.some((member) => member.id === bot.botInfo?.id)) {
+
+                await serverRequest.post('/api/Event/create', {
+                    "eventName": chatName,
+                    "telegramChatId": currentChatId,
+                    "userId": creatorTelegramId
+                });
+
+                ctx.reply(`Created Event ${chatName}`);
+                console.log('Bot added to chat:', ctx.chat?.id);
+            } else {
+                console.error('Unexpected new_chat_members event:', ctx.message.new_chat_members);
+            }
+        } catch (error) {
+            console.error('Failed to create event:', error);
         }
+    });
+
+    bot.on('chat_member', (ctx) => {
+        console.log(ctx.chatMember.new_chat_member.user.id);
     });
 
     bot.on('callback_query', (ctx) => {
