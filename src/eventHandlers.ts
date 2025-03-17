@@ -1,6 +1,26 @@
-import { Telegraf } from 'telegraf';
+import { Telegraf, Context, Markup } from 'telegraf';
 import { getStorage, PollStorage } from './storage';
 import ServerRequest from './serverRequest';
+
+const MINI_APP_URL = 'https://t.me/event_planner_tg_bot/EventPlannerTg'; // Change this to your mini app URL
+
+export async function sendEventInvite(ctx: Context) {
+    let messageText = "You've joined the event! Click the button below to open the event page in the Mini App.";
+    const request = ServerRequest.getInstance();
+    const eventId = ctx.chat?.id;
+    const response = await request.post<string>(`/api/Event/${eventId}/join/${ctx.message?.from.id}`, {});
+    if (response === 'User not found') {
+        messageText = "You need to start the mini app first to join the event. Click the button below to open the mini app.";
+    }
+
+    // Use a properly formatted inline keyboard with a WebApp button
+    await ctx.reply(
+        messageText,
+        Markup.inlineKeyboard([
+            Markup.button.url('Join Event', MINI_APP_URL, false)
+        ])
+    );
+}
 
 export function registerEventHandlers(bot: Telegraf) {
     let activePolls: PollStorage = getStorage();
@@ -69,3 +89,4 @@ export function registerEventHandlers(bot: Telegraf) {
         ctx.answerCbQuery('Received your input.');
     });
 }
+

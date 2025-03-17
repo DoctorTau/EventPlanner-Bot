@@ -3,6 +3,7 @@ import { BOT_TOKEN } from './config';
 import { createPoll, getPollResults } from './pollManager';
 import { registerEventHandlers } from './eventHandlers';
 import { getStorage } from './storage';
+import { registerCommands } from './commands';
 
 // Initialize Redis Storage
 const pollStoage = getStorage();
@@ -10,8 +11,7 @@ const pollStoage = getStorage();
 const bot = new Telegraf(BOT_TOKEN);
 
 // Register commands
-bot.command('createpoll', createPoll);
-bot.command('pollresults', getPollResults);
+registerCommands(bot);
 
 // Register event handlers
 registerEventHandlers(bot);
