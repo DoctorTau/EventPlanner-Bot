@@ -8,7 +8,7 @@ import { registerCommands } from './commands';
 // Initialize Redis Storage
 const pollStoage = getStorage();
 
-const bot = new Telegraf(BOT_TOKEN);
+export const bot = new Telegraf(BOT_TOKEN);
 
 // Register commands
 registerCommands(bot);
@@ -20,5 +20,12 @@ registerEventHandlers(bot);
 bot.launch().then(() => console.log('Bot started!'));
 
 // Graceful shutdown
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.once('SIGINT', async () => {
+    await bot.stop();
+    process.exit();
+});
+
+process.once('SIGTERM', async () => {
+    await bot.stop();
+    process.exit();
+});

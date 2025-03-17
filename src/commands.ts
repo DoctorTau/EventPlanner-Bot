@@ -1,4 +1,4 @@
-import { Telegraf } from 'telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { createPoll, getPollResults } from './pollManager';
 import { sendEventInvite } from './eventHandlers';
 
