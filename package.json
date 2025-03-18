@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"nodemon src/bot.ts\" \"nodemon src/server/server.ts\"",
+    "dev": "nodemon src/bot.ts",
     "build": "tsc",
-    "start": "node dist/bot.js & node dist/server.js"
+    "start": "node dist/bot.js"
   },
   "keywords": [],
   "author": "",
