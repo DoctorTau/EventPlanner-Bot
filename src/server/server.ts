@@ -46,7 +46,7 @@ class EventPlannerServer {
                 { is_anonymous: false }
             );
 
-            await this.storage.savePoll(pollMessage.poll.id, votingId, options, new Array(options.length).fill(0));
+            await this.storage.savePoll(pollMessage.poll.id.toString(), votingId, options, new Array(options.length).fill(0));
 
             res.json({ success: true, pollId: pollMessage.poll.id });
             console.log('Vote started:', votingId, options, chatId);

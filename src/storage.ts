@@ -1,8 +1,8 @@
 import Redis from 'ioredis';
 
 export interface PollStorage {
-    savePoll(pollId: string, question: string, options: string[], votes: number[]): Promise<void>;
-    loadPoll(pollId: string): Promise<{ question: string; options: string[]; votes: number[] } | null>;
+    savePoll(tgPollId: string, pollId: number, options: string[], votes: number[]): Promise<void>;
+    loadPoll(tgPollId: string): Promise<{ pollId: number; options: string[]; votes: number[] } | null>;
     getLatestPoll(): Promise<string | null>;
 }
 
@@ -16,12 +16,12 @@ class RedisStorage implements PollStorage {
         });
     }
 
-    async savePoll(pollId: string, question: string, options: string[], votes: number[]): Promise<void> {
-        await this.redis.set(`poll:${pollId}`, JSON.stringify({ question, options, votes }));
+    async savePoll(tgPollId: string, pollId: number, options: string[], votes: number[]): Promise<void> {
+        await this.redis.set(`poll:${tgPollId}`, JSON.stringify({ pollId, options, votes }));
     }
 
-    async loadPoll(pollId: string): Promise<{ question: string; options: string[]; votes: number[] } | null> {
-        const data = await this.redis.get(`poll:${pollId}`);
+    async loadPoll(tgPollId: string): Promise<{ pollId: number; options: string[]; votes: number[] } | null> {
+        const data = await this.redis.get(`poll:${tgPollId}`);
         return data ? JSON.parse(data) : null;
     }
 

@@ -30,25 +30,33 @@ export function registerEventHandlers(bot: Telegraf) {
             return console.log('Invalid poll answer:', ctx.pollAnswer);
         }
 
-        const pollId = ctx.pollAnswer.poll_id;
+        const tgPollId = ctx.pollAnswer.poll_id;
         const userId = ctx.pollAnswer.user.id;
         const optionIds = ctx.pollAnswer.option_ids;
 
-        const poll = await activePolls.loadPoll(pollId);
+        const poll = await activePolls.loadPoll(tgPollId);
         if (!poll) {
-            return console.log(`Received answer for unknown poll: ${pollId}`);
+            return console.log(`Received answer for unknown poll: ${tgPollId}`);
         }
 
+        const serverRequest = ServerRequest.getInstance();
         optionIds.forEach(optionId => {
             if (poll.votes[optionId] !== undefined) {
-                poll.votes[optionId] += 1;
+                try {
+                    serverRequest.post('/api/Poll/vote', {
+                        "PollId": poll.pollId,
+                        "UserId": userId,
+                        "VoteIndex": optionId
+                    })
+                    poll.votes[optionId] += 1;
+                } catch (error) {
+                    console.error('Failed to send vote to server:', error);
+                }
             }
         });
 
-        console.log(`User ${userId} voted in poll '${poll.question}'`);
-        optionIds.forEach(optionId => {
-            console.log(`- ${poll.options[optionId]}: ${poll.votes[optionId]} votes`);
-        });
+        await activePolls.savePoll(tgPollId, poll.pollId, poll.options, poll.votes);
+        console.log('Poll answer processed:', tgPollId, userId, optionIds);
     });
 
     bot.on('new_chat_members', async (ctx) => {

@@ -24,7 +24,7 @@ export async function createPoll(ctx: Context) {
 
     try {
         const pollMessage = await ctx.replyWithPoll(question, options, { is_anonymous: false });
-        await storage.savePoll(pollMessage.poll.id, question, options, new Array(options.length).fill(0));
+        // await storage.savePoll(pollMessage.poll.id, question, options, new Array(options.length).fill(0));
     } catch (error) {
         console.error('Failed to create poll:', error);
         ctx.reply('Failed to create poll.');
@@ -48,7 +48,7 @@ export async function handlePollAnswer(ctx: Context) {
         poll.votes[optionId] += 1;
     });
 
-    await storage.savePoll(pollId, poll.question, poll.options, poll.votes);
+    // await storage.savePoll(pollId, poll.question, poll.options, poll.votes);
 }
 
 // Retrieve poll results
