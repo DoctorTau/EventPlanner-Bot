@@ -1,6 +1,4 @@
-import { Context } from 'telegraf';
 import { bot } from './bot';
-import { Format } from 'telegraf';
 
 export interface SummaryMessage {
     chatId: number;
