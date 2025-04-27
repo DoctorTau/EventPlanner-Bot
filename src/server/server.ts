@@ -4,6 +4,7 @@ import cors from 'cors';
 import { bot } from '../bot';
 import { getStorage, PollStorage } from '../storage';
 import ServerRequest from '../serverRequest';
+import { sendAndPinSummaryMessage } from '../summaryMessageSender';
 
 class EventPlannerServer {
     private app: express.Application;
@@ -26,6 +27,7 @@ class EventPlannerServer {
 
     private configureRoutes(): void {
         this.app.post('/start-vote', this.startVote.bind(this));
+        this.app.post('/send-event-summary', this.sendEventSummary.bind(this));
     }
 
     private async startVote(req: express.Request, res: express.Response): Promise<void> {
@@ -64,6 +66,32 @@ class EventPlannerServer {
             console.trace('Poll created on server:', poll);
         } catch (error) {
             console.error('Error starting vote:', error);
+        }
+    }
+
+    private async sendEventSummary(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const { chatId, title, description, date, location } = req.body;
+
+            if (!chatId || !title || !description || !date || !location) {
+                res.status(400).json({ error: 'Invalid request format' });
+                return;
+            }
+
+            const summaryMessage = {
+                chatId,
+                title,
+                description,
+                date,
+                location
+            };
+
+            await sendAndPinSummaryMessage(summaryMessage);
+            res.json({ success: true });
+            console.log('Event summary sent:', summaryMessage);
+        } catch (error) {
+            console.error('Error sending event summary:', error);
+            res.status(500).json({ error: 'Failed to send event summary' });
         }
     }
 
