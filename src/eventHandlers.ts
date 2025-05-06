@@ -1,6 +1,7 @@
 import { Telegraf, Context, Markup } from 'telegraf';
 import { getStorage, PollStorage } from './storage';
 import ServerRequest from './serverRequest';
+import { message } from 'telegraf/filters'
 
 const MINI_APP_URL = 'https://t.me/event_planner_tg_bot/EventPlannerTg'; // Change this to your mini app URL
 
@@ -59,7 +60,7 @@ export function registerEventHandlers(bot: Telegraf) {
         console.log('Poll answer processed:', tgPollId, userId, optionIds);
     });
 
-    bot.on('new_chat_members', async (ctx) => {
+    bot.on(message('new_chat_members'), async (ctx) => {
         if (!ctx.message || !ctx.message.new_chat_members) {
             return;
         }
