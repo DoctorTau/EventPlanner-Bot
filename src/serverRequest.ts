@@ -1,4 +1,3 @@
-
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { API_BASE_URL } from './config';
 
@@ -16,8 +15,14 @@ class ServerRequest {
     public static getInstance(): ServerRequest {
         if (!ServerRequest.instance) {
             const baseURL = API_BASE_URL
+            const botToken = process.env.BOT_TOKEN;
+            if (!botToken) {
+                throw new Error('BOT_TOKEN environment variable is not set');
+            }
+
             const headers: Record<string, string> = {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-Secret-Key': botToken
             };
 
             ServerRequest.instance = new ServerRequest(baseURL, headers);

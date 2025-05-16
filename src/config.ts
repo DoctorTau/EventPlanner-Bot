@@ -8,3 +8,7 @@ export const API_BASE_URL = process.env.API_BASE_URL || '';
 if (!BOT_TOKEN) {
     throw new Error('BOT_TOKEN is missing in .env');
 }
+
+if (!API_BASE_URL) {
+    throw new Error('API_BASE_URL is missing in .env');
+}

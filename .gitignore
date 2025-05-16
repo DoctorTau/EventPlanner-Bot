@@ -92,3 +92,5 @@ public/
 
 # MacOS files
 .DS_Store
+
+/dist
